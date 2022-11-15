@@ -15,7 +15,8 @@ const server = http.createServer(app)
 
 const io = socketIo(server, {
   cors: {
-        origin: "http://localhost:3000",
+        origin: "http://34.224.66.154:3000",
+        // origin: "http://localhost:3000",
         methods: ["GET", "POST"]
       }
 })
@@ -61,17 +62,21 @@ program
   // const Topic = 'TEST-999666'
   const Topic = 'TEST-999666'
   const client = mqtt.connect(connectUrl, OPTIONS)
-  
+  client.on('connect', mqtt_connect);
 // Listening for a connection on the socket.io server
-
+function mqtt_connect()
+{
+    console.log("Connecting MQTT");
+    client.subscribe("bike", {qos: 0});
+}
 io.on('connection', (socket)=>{
   console.log('a user connected');
   // the moment i get a connection, i want to send a welcome message
-  socket.on('join', ({name, room})=>{
-    socket.emit('message', {user:'admin', text:`${name}, You're welcome!`})
-    socket.broadcast.emit('message', {user:'admin', text:`${name}, just joined`})
-    console.log('welcome message')
-  })
+  // socket.on('join', ({name, room})=>{
+  //   socket.emit('message', {user:'admin', text:`${name}, You're welcome!`})
+  //   socket.broadcast.emit('message', {user:'admin', text:`${name}, just joined`})
+  //   console.log('welcome message')
+  // })
 
   socket.on('sendMessage', (message)=>{
     io.emit('message', {user:'user', text:message})
@@ -81,17 +86,13 @@ io.on('connection', (socket)=>{
     console.log("disconnect");
     io.emit('message', {user:'admin', text:`user Just left!`})
   })
-  client.on('connect', mqtt_connect);
+  
   client.on('reconnect', mqtt_reconnect);
   client.on('error', mqtt_error);
   client.on('message', mqtt_messsageReceived);
   client.on('close', mqtt_close);
   
-  function mqtt_connect()
-  {
-      console.log("Connecting MQTT");
-      client.subscribe("bike", {qos: 1}, mqtt_subscribe);
-  }
+  
   
   function mqtt_subscribe(err, granted)
   {
@@ -123,7 +124,7 @@ io.on('connection', (socket)=>{
       text: message.toString(),
       topic: topic
     });
-    console.log('Topic=' +  topic + '  Message=' + message);
+    // console.log('Topic=' +  topic + '  Message=' + message);
   }
   
   function mqtt_close()
@@ -132,6 +133,30 @@ io.on('connection', (socket)=>{
   }
 })
 
+app.get('/savescooter', (req, res) => {
+  console.log(req.query);
+  var params = req.query;
+  // client.publish("", message, [options], [callback])
+  if(params.power == 'true'){
+    client.publish(params.scooterID,"{'a':1}");
+  } else if(params.power == 'false'){
+    client.publish(params.scooterID,"{'a':3}");
+  } 
+  if(params.lights == 'true'){
+    client.publish(params.scooterID,"{'a':37,'d':1}");
+  } else if(params.lights == 'false'){
+    client.publish(params.scooterID,"{'a':37,'d':0}");
+  }
+  if(params.alarm == 'true'){
+    client.publish(params.scooterID,"{'a':28}");
+  }
+  if(params.battery == 'true'){
+    client.publish(params.scooterID,"{'a':62}");
+  } else if(params.battery == 'false'){
+    client.publish(params.scooterID,"{'a':60}");
+  }
+  res.send("Success")
+})
 
-const port = process.env.PORT || 8000
+const port = process.env.PORT || 8080
 server.listen(port, ()=> console.log(`Listening on port : ${port}`))
