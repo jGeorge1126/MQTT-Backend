@@ -85,6 +85,7 @@ io.on('connection', (socket)=>{
   socket.on("disconnect", ()=>{
     console.log("disconnect");
     io.emit('message', {user:'admin', text:`user Just left!`})
+    // client.end();
   })
   
   client.on('reconnect', mqtt_reconnect);
@@ -102,14 +103,14 @@ io.on('connection', (socket)=>{
   
   function mqtt_reconnect(err)
   {
-      console.log("Reconnect MQTT");
-      if (err) {console.log(err);}
+    console.log("Reconnect MQTT");
+    if (err) {console.log(err);}
     client  = mqtt.connect(connectUrl, OPTIONS);
   }
   
   function mqtt_error(err)
   {
-      console.log("Error!");
+    console.log("Error!");
     if (err) {console.log(err);}
   }
   
@@ -133,28 +134,57 @@ io.on('connection', (socket)=>{
   }
 })
 
-app.get('/savescooter', (req, res) => {
+app.get('/changebatterystatus', async (req, res) => {
+  console.log(req.query);
+  var params = req.query;
+  // client.publish("", message, [options], [callback])
+  if(params.battery == 'true'){
+    await client.publish(params.scooterID,"{'a':62}");
+  } else if(params.battery == 'false'){
+    await client.publish(params.scooterID,"{'a':60}");
+  }
+  res.send("Success")
+})
+
+app.get('/changelightstatus', async (req, res) => {
+  console.log(req.query);
+  var params = req.query;
+  // client.publish("", message, [options], [callback])
+  if(params.lights == 'true'){
+    await client.publish(params.scooterID,"{'a':37,'d':1}");
+  } else if(params.lights == 'false'){
+    await client.publish(params.scooterID,"{'a':37,'d':0}");
+  }
+  res.send("Success")
+})
+
+app.get('/changealarmstatus', async (req, res) => {
+  console.log(req.query);
+  var params = req.query;
+  // client.publish("", message, [options], [callback])
+  if(params.alarm == 'true'){
+    await client.publish(params.scooterID,"{'a':28}");
+  }
+  res.send("Success")
+})
+
+app.get('/changepowerstatus', async (req, res) => {
   console.log(req.query);
   var params = req.query;
   // client.publish("", message, [options], [callback])
   if(params.power == 'true'){
-    client.publish(params.scooterID,"{'a':1}");
+    await client.publish(params.scooterID,"{'a':1}");
   } else if(params.power == 'false'){
-    client.publish(params.scooterID,"{'a':3}");
-  } 
-  if(params.lights == 'true'){
-    client.publish(params.scooterID,"{'a':37,'d':1}");
-  } else if(params.lights == 'false'){
-    client.publish(params.scooterID,"{'a':37,'d':0}");
+    await client.publish(params.scooterID,"{'a':3}");
   }
-  if(params.alarm == 'true'){
-    client.publish(params.scooterID,"{'a':28}");
-  }
-  if(params.battery == 'true'){
-    client.publish(params.scooterID,"{'a':62}");
-  } else if(params.battery == 'false'){
-    client.publish(params.scooterID,"{'a':60}");
-  }
+  res.send("Success")
+})
+
+app.get('/scootersetting', async (req, res) => {
+  console.log(req.query);
+  var params = req.query;
+  var payload = JSON.stringify(params)
+  await client.publish(params.scooterID,payload);
   res.send("Success")
 })
 
