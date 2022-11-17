@@ -24,7 +24,7 @@ const io = socketIo(server, {
 program
   .option('-p, --protocol <type>', 'connect protocol: mqtt, mqtts, ws, wss. default is mqtt', 'mqtt')
   .parse(process.argv)
-  const host = '101.37.148.19'
+  const host = '54.210.189.224'
   const mqttport = '1883'
   const clientId = `mqtt_${Math.random().toString(16).slice(3)}`
   
@@ -33,8 +33,8 @@ program
     clientId,
     clean: true,
     connectTimeout: 4000,
-    username: 'serverclient',
-    password: 'password',
+    username: 'mqtt',
+    password: 'mqtt123456',
     reconnectPeriod: 1000,
   }
   // protocol list
@@ -105,7 +105,7 @@ io.on('connection', (socket)=>{
   {
     console.log("Reconnect MQTT");
     if (err) {console.log(err);}
-    client  = mqtt.connect(connectUrl, OPTIONS);
+    client = mqtt.connect(connectUrl, OPTIONS);
   }
   
   function mqtt_error(err)
@@ -125,7 +125,7 @@ io.on('connection', (socket)=>{
       text: message.toString(),
       topic: topic
     });
-    // console.log('Topic=' +  topic + '  Message=' + message);
+    console.log('Topic=' +  topic + '  Message=' + message);
   }
   
   function mqtt_close()
@@ -183,8 +183,7 @@ app.get('/changepowerstatus', async (req, res) => {
 app.get('/scootersetting', async (req, res) => {
   console.log(req.query);
   var params = req.query;
-  var payload = JSON.stringify(params)
-  await client.publish(params.scooterID,payload);
+  await client.publish(params.scooterID,params.payload);
   res.send("Success")
 })
 
