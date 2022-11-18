@@ -41,59 +41,6 @@ router.post('/updateEmailAndPassword', function(req, res) {
   res.send('sucess');
 })
 
-router.get('/changebatterystatus', async (req, res) => {
-  console.log(req.query);
-  var params = req.query;
-  // client.publish("", message, [options], [callback])
-  if(params.battery == 'true'){
-    await client.publish(params.scooterID,"{'a':62}");
-  } else if(params.battery == 'false'){
-    await client.publish(params.scooterID,"{'a':60}");
-  }
-  res.send("Success")
-})
-
-router.get('/changelightstatus', async (req, res) => {
-  console.log(req.query);
-  var params = req.query;
-  // client.publish("", message, [options], [callback])
-  if(params.lights == 'true'){
-    await client.publish(params.scooterID,"{'a':37,'d':1}");
-  } else if(params.lights == 'false'){
-    await client.publish(params.scooterID,"{'a':37,'d':0}");
-  }
-  res.send("Success")
-})
-
-router.get('/changealarmstatus', async (req, res) => {
-  console.log(req.query);
-  var params = req.query;
-  // client.publish("", message, [options], [callback])
-  if(params.alarm == 'true'){
-    await client.publish(params.scooterID,"{'a':28}");
-  }
-  res.send("Success")
-})
-
-router.get('/changepowerstatus', async (req, res) => {
-  console.log(req.query);
-  var params = req.query;
-  // client.publish("", message, [options], [callback])
-  if(params.power == 'true'){
-    await client.publish(params.scooterID,"{'a':1}");
-  } else if(params.power == 'false'){
-    await client.publish(params.scooterID,"{'a':3}");
-  }
-  res.send("Success")
-})
-
-router.get('/scootersetting', async (req, res) => {
-  console.log(req.query);
-  var params = req.query;
-  await client.publish(params.scooterID,params.payload);
-  res.send("Success")
-})
-
 router.post("/new-contact", async (req, res) => {
   const { firstname, lastname, email, phone } = req.body;
   await db.collection("contacts").add({
