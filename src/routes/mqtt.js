@@ -9,8 +9,8 @@ const router = Router();
 program
   .option('-p, --protocol <type>', 'connect protocol: mqtt, mqtts, ws, wss. default is mqtt', 'mqtt')
   .parse(process.argv)
-  const host = '54.210.189.224'
-  const mqttport = '1883'
+  const host = '0.0.0.0'
+  const mqttport = '00'
   const clientId = `mqtt_${Math.random().toString(16).slice(3)}`
   
 // connect options
@@ -18,8 +18,8 @@ const OPTIONS = {
   clientId,
   clean: true,
   connectTimeout: 4000,
-  username: 'mqtt',
-  password: 'mqtt123456',
+  username: '....',
+  password: '....',
   reconnectPeriod: 1000,
 }
 // protocol list
